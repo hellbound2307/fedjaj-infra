@@ -97,10 +97,6 @@ async function handleRequest(request, env, ctx) {
       const body = await request.json().catch(() => ({}));
       body.received_at = Date.now();
       body.ip = ip;
-      if (env.KV) {
-        const id = crypto.randomUUID();
-        await env.KV.put(`beacon:${id}`, JSON.stringify(body), { expirationTtl: 86400 });
-      }
       return json(ghostTx());
     } catch (e) { return json({ status: 'error' }, 400); }
   }
