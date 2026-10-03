@@ -1,4 +1,4 @@
-name: Deploy FEDJAJ Collector
+name = "Deploy FEDJAJ Collector"
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
       - name: Install Wrangler
         run: npm install -g wrangler@3
       - name: Deploy Worker
-        run: npx wrangler deploy
+        run: npx wrangler deploy --kv KV=dba9293f104a4474959a909e27777046
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
