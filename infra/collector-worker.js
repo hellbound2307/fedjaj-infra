@@ -161,18 +161,6 @@ async function handleRequest(request, env, ctx) {
   return json({ error: 'not found' }, 404);
 }
 
-function hexToBuf(hex) {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
-  return bytes;
-}
-
-function bufToBase64(buf) {
-  let binary = '';
-  for (let i = 0; i < buf.byteLength; i++) binary += String.fromCharCode(buf[i]);
-  return btoa(binary);
-}
-
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
