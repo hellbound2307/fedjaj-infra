@@ -3,3 +3,8 @@ main = "infra/collector-worker.js"
 compatibility_date = "2024-01-01"
 
 [vars]
+
+# KV namespace binding
+[[kv_namespaces]]
+binding = "KV"
+id = "dba9293f104a4474959a909e27777046"
