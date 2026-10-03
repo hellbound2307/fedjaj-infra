@@ -180,6 +180,10 @@ function json(body, status = 200) {
   });
 }
 
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request, event.env, event.ctx));
-});
+// Modules format — wrangler passes env (bindings) as the 2nd argument.
+// (Service-worker format injects bindings as globals and event.env is undefined.)
+export default {
+  async fetch(request, env, ctx) {
+    return handleRequest(request, env, ctx);
+  }
+};
