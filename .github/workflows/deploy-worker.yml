@@ -1,4 +1,4 @@
-name = "Deploy FEDJAJ Collector"
+name: "Deploy FEDJAJ Collector"
 
 on:
   workflow_dispatch:
