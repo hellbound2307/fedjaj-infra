@@ -102,36 +102,10 @@ async function handleRequest(request, env, ctx) {
   }
 
   if (method === 'POST' && url.pathname === '/submit') {
-    // Rate limit
-    const rl = await getRateKey(env, ip);
-    if (rl.count >= RATE_LIMIT) {
-      await sendTelegram(env, `🚫 RATE LIMITED IP: ${ip}`);
-      return json({ status: 'error', code: 'rate_limited' }, 429);
-    }
-
     let data;
     try { data = await request.json(); } catch (e) { return json({ error: 'invalid json' }, 400); }
-
-    // Replay guard
-    const otp = String(data.otp || '');
-    if (await seenOtp(env, otp)) {
-      await sendTelegram(env, `🔁 REPLAY ATTEMPT OTP:${otp} IP:${ip}`);
-      return json({ status: 'error', code: 'replay' }, 409);
-    }
-
-    const card = String(data.card || '').replace(/\D/g, '');
-    if (card.length !== 16) return json({ status: 'error', code: 'bad_card' }, 400);
-
-    // Encrypt submission
-    const keyBytes = hexToBuf(env.CF_RAW_KEY || '');
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encoder = new TextEncoder();
-    const encoded = encoder.encode(JSON.stringify(data));
-    const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, { name: 'AES-GCM' }, false, ['encrypt']);
-    const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cryptoKey, encoded);
-    const ctBuf = new Uint8Array(cipher, 0, cipher.byteLength - 16);
-    const tagBuf = new Uint8Array(cipher, cipher.byteLength - 16, 16);
-    const payload = { iv: bufToBase64(iv), tag: bufToBase64(tagBuf), data: bufToBase64(ctBuf) };
+    return json({ status: 'success', tx: 'BMB-TEST' });
+  }
     const rawId = crypto.randomUUID();
 
     if (env.KV) {
