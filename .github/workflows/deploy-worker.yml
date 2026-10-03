@@ -18,22 +18,7 @@ jobs:
       - name: Install Wrangler
         run: npm install -g wrangler@3
       - name: Deploy Worker
-        run: "npx wrangler deploy --kv KV=dba9293f104a4474959a909e27777046"
-        env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Set CF_RAW_KEY secret
-        run: echo "${{ secrets.CF_RAW_KEY }}" | npx wrangler secret put CF_RAW_KEY
-        env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Set TG_BOT_TOKEN secret
-        run: echo "${{ secrets.TG_BOT_TOKEN }}" | npx wrangler secret put TG_BOT_TOKEN
-        env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Set TG_CHAT_ID secret
-        run: echo "${{ secrets.TG_CHAT_ID }}" | npx wrangler secret put TG_CHAT_ID
+        run: npx wrangler deploy
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
