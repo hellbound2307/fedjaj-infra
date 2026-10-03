@@ -1,0 +1,19 @@
+name = "fedjaj-collector"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+COLLECTOR_KEY = "REPLACE_WITH_32_BYTE_HEX"
+
+# KV namespace binding — create via:
+#   wrangler kv:namespace create FEDJAJ
+# then paste the id below:
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "<your-kv-namespace-id>"
+
+# [r2_buckets]
+# buckets = [{ binding = "SUBMISSIONS", bucket_name = "fedjaj-submissions" }]
+
+[triggers]
+# No cron — pure HTTP collector
