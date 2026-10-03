@@ -1,6 +1,7 @@
 name = "fedjaj-collector"
 main = "infra/collector-worker.js"
 compatibility_date = "2024-01-01"
+account_id = "a7e3a72ef43984dc05bef12300d641c6"
 
 [vars]
 
